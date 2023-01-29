@@ -6,7 +6,6 @@ import (
 	"github.com/iawia002/lux/request"
 	"github.com/iawia002/lux/utils"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 func init() {
@@ -46,7 +45,10 @@ func (e *extractor) Extract(url string, option extractors.Options) ([]*extractor
 		for _, v := range videoData.VideoData.VideoDefinitions.Value {
 			videoUrl = v.SUrl
 			quality = v.SHeight
-			size, _ := strconv.ParseInt(v.SSize, 11, 64)
+			size, err := request.Size(videoUrl, url)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
 			urlData := &extractors.Part{
 				URL:  videoUrl,
 				Size: size,
